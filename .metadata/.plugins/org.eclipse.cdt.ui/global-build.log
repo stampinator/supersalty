@@ -1,0 +1,23 @@
+
+**** Build of configuration Debug for project saltydatabot ****
+
+make all 
+Building file: ../src/main.cpp
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/main.d" -MT"src/main.d" -o "src/main.o" "../src/main.cpp"
+Finished building: ../src/main.cpp
+ 
+Building target: saltydatabot
+Invoking: GCC C++ Linker
+g++  -o "saltydatabot"  ./src/WindowMonitor.o ./src/main.o   -lX11 -ltesseract -lopencv_core -lopencv_contrib -lopencv_highgui -lopencv_imgproc
+Finished building target: saltydatabot
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project saltydatabot ****
+
+make all 
+make: Nothing to be done for `all'.
+
+**** Build Finished ****

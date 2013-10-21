@@ -1,0 +1,30 @@
+!SESSION 2013-10-21 17:08:36.006 -----------------------------------------------
+eclipse.buildId=debbuild
+java.version=1.7.0_25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.cdt.core 4 0 2013-10-21 17:09:45.311
+!MESSAGE Error: Resource '/saltydatabot/src/saltydatabot.cpp' does not exist.
+!STACK 1
+org.eclipse.core.internal.resources.ResourceException: Resource '/saltydatabot/src/saltydatabot.cpp' does not exist.
+	at org.eclipse.core.internal.resources.Resource.checkExists(Resource.java:341)
+	at org.eclipse.core.internal.resources.Resource.checkAccessible(Resource.java:215)
+	at org.eclipse.core.internal.resources.File.getContents(File.java:287)
+	at org.eclipse.cdt.internal.core.parser.InternalParserUtil.createWorkspaceFileContent(InternalParserUtil.java:157)
+	at org.eclipse.cdt.core.parser.FileContent.create(FileContent.java:83)
+	at org.eclipse.cdt.core.parser.FileContent.create(FileContent.java:67)
+	at org.eclipse.cdt.internal.core.pdom.indexer.ProjectIndexerInputAdapter.getCodeReader(ProjectIndexerInputAdapter.java:296)
+	at org.eclipse.cdt.internal.core.pdom.AbstractIndexerTask.parseFile(AbstractIndexerTask.java:875)
+	at org.eclipse.cdt.internal.core.pdom.AbstractIndexerTask.parseLinkage(AbstractIndexerTask.java:743)
+	at org.eclipse.cdt.internal.core.pdom.AbstractIndexerTask.runTask(AbstractIndexerTask.java:371)
+	at org.eclipse.cdt.internal.core.pdom.indexer.PDOMIndexerTask.run(PDOMIndexerTask.java:127)
+	at org.eclipse.cdt.internal.core.pdom.indexer.PDOMRebuildTask.run(PDOMRebuildTask.java:85)
+	at org.eclipse.cdt.internal.core.pdom.PDOMIndexerJob.run(PDOMIndexerJob.java:137)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 org.eclipse.core.resources 4 368 2013-10-21 17:09:45.312
+!MESSAGE Resource '/saltydatabot/src/saltydatabot.cpp' does not exist.
+
+!ENTRY org.eclipse.cdt.core 1 0 2013-10-21 17:09:45.318
+!MESSAGE Indexed 'saltydatabot' (2 sources, 275 headers) in 10.92 sec: 48,161 declarations; 73,584 references; 0 unresolved inclusions; 11 syntax errors; 546 unresolved names (0.45%)
