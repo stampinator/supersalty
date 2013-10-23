@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <tesseract/baseapi.h>
+#include <boost/regex.hpp>
 
 #define TRAINING_PATH "training"
 #define IMAGE_REGEX "eng.salt.exp([0-9]+).tif"
@@ -23,6 +24,7 @@ const char* debugWindow = "debug";
 
 using namespace std;
 using namespace cv;
+using namespace boost;
 
 WindowMonitor::WindowMonitor() :
 	_debugWindow(),
@@ -30,8 +32,9 @@ WindowMonitor::WindowMonitor() :
 	_prevBlue(),
 	_imgNum(0),
 	_tess(){
-		_tess.Init(NULL,"eng",tesseract::OEM_DEFAULT);
-		_tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+		_tess.Init(NULL,"eng");
+//		_tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+		_tess.SetVariable("tessedit_char_whitelist","ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 }
 
 WindowMonitor::~WindowMonitor() {
@@ -88,8 +91,9 @@ void WindowMonitor::setDisplay(Display* display) {
 
 void WindowMonitor::readNames(Mat mat) {
 	mat = cropToVideo(mat);
-	Rect player1NameBounds(200,13,mat.cols-200,44);
-	Rect player2NameBounds(0,604,mat.cols,44);
+	Rect player1NameBounds(200,12,mat.cols-200,44);
+	Rect player2NameBounds(0,603,mat.cols,44); //UNCOMMENT FOR FIREFOX
+//	Rect player2NameBounds(0,578,mat.cols,44); //UNCOMMENT FOR IMAGE VIEWER
 	Mat player1Mat = mat(player1NameBounds);
 	Mat player2Mat = mat(player2NameBounds);
 	NameReturn ret;
@@ -123,17 +127,28 @@ NameReturn WindowMonitor::readName(cv::Mat in, bool isRed) {
 	NameReturn ret;
 	vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
+//	if(isRed){
+//		imshow("red1", in);
+//	} else {
+//		imshow("red2", in);
+//	}
 	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(3,3), Point(1,1));
 
 
 	if(isRed){
-		inRange(in,Scalar(25,55,165),Scalar(80,85,245),in);
+//		inRange(in,Scalar(25,55,165),Scalar(80,85,245),in);
+//		inRange(in,Scalar(25,50,160),Scalar(80,90,245),in);
+		inRange(in,Scalar(25,50,145),Scalar(80,90,245),in);
 
 	} else {
-		inRange(in,Scalar(185,135,28),Scalar(255,170,100),in);
+//		inRange(in,Scalar(185,135,28),Scalar(255,170,100),in);
+		inRange(in,Scalar(185,120,28),Scalar(255,170,100),in);
 	}
 
 	findContours(in.clone(),contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point(0,0));
+
+	//shave off edge pixels
+	rectangle(in,Point(0,0),Point(in.cols-1,in.rows-1),Scalar(0,0,0),1,8,0);
 
 	for(unsigned int i = 0; i < contours.size(); i++){
 		double size = contourArea(contours[i]);
@@ -143,12 +158,15 @@ NameReturn WindowMonitor::readName(cv::Mat in, bool isRed) {
 		//remove noise
 		if(     rect.area() > 2000 || rect.area() < 80 ||
 				rect.width > 40||
-				rect.height > 30 || rect.height < 20 ||
+				rect.height > 35 || rect.height < 28 ||
 				size < 25 || size > 1000) {
 			//erase matches
 			drawContours(in,contours,i,Scalar(0),-1);
 		}
+
 	}
+//	Rect r(1,1,in.cols - 2, in.rows - 2);
+//	in = in(r);
 
 	_tess.SetImage((uchar*)in.data, in.cols,in.rows, 1, in.cols);
 	ret.name = _tess.GetUTF8Text();
@@ -161,12 +179,24 @@ void WindowMonitor::saveImage(Mat image){
 	getcwd(cwd, 200);
 	sprintf(cwd,"%s/training/",cwd);
 	vector<string> files = Directory::GetListFiles(cwd);
+
+	cmatch matches;
+	regex regex(IMAGE_REGEX);
+	long fileNum = -1;
 	for(unsigned int i = 0; i < files.size(); i++){
-//		if(regex_match(files[i],regex(IMAGE_REGEX,regex_constants::basic))){
-//			cout << files[i];
-//		}
+		if(regex_match(files[i].c_str(),matches,regex)){
+			string str(matches[1].first,matches[1].second);
+			long currentNum = atol(str.c_str());
+			if(currentNum > fileNum) fileNum = currentNum;
+		}
 	}
-	cout << endl;
+
+	stringstream fileName;
+	fileName << cwd << "eng.salt.exp" << ++fileNum << ".tif";
+
+	cout << "Saving image " << fileName.str() << "..." << endl;
+	imwrite(fileName.str(), image);
+
 }
 
 

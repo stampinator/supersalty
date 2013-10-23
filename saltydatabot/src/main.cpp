@@ -18,7 +18,14 @@ std::string getWindowName(Display *disp, Window win) {
 
         return NULL;
     }
-    std::string str = (char*)list;
+
+    std::string str;;
+
+    if(list != NULL){
+		str = (char*)list;
+    } else {
+    	str = "Unknown window";
+    }
 
     return str;
 }
