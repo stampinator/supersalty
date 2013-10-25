@@ -11,12 +11,12 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <tesseract/baseapi.h>
+#include <boost/array.hpp>
 
 typedef struct {
 	std::string name;
 	cv::Mat image;
 } NameReturn;
-
 
 class WindowMonitor {
 public:
@@ -29,10 +29,11 @@ public:
 	void setDisplay(Display* display);
 
 private:
-	void readNames(cv::Mat mat);
+	boost::array<std::string,2> readNames(cv::Mat mat);
 	cv::Mat cropToVideo(cv::Mat in);
 	NameReturn readName(cv::Mat in, bool isRed);
 	void saveImage(cv::Mat mat);
+	int findWinner(cv::Mat in);
 
 	Window* _window;
 	Display* _display;

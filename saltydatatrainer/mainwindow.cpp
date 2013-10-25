@@ -200,15 +200,18 @@ void MainWindow::deleteCurrentFile(){
 void MainWindow::combineAndFinish() {
     qDebug() << "Finished reading files. Combining training data and cleaning up";
 
-    QString command("convert stage/eng.salt.exp0.tif ");
-    QTextStream commandStream(&command);
+    QStringList::Iterator it = _files.begin();
+    while(it != _files.end()){
+        QString command("convert stage/eng.salt.exp0.tif ");
+        QTextStream commandStream(&command);
+        for(int i = 0; i < 20 && it != _files.end(); i++){
+            commandStream << *it++ << " ";
+        }
 
-    foreach(QString fileName, _files){
-        commandStream << fileName << " ";
+        commandStream << "stage/eng.salt.exp0.tif";
+        commandStream.flush();
+        execShell(command);
     }
-
-    commandStream << "stage/eng.salt.exp0.tif";
-    execShell(command);
 
     QFile combinedBoxFile("stage/eng.salt.exp0.box");
 
@@ -221,7 +224,7 @@ void MainWindow::combineAndFinish() {
     while(!combinedBoxFile.error()){
         combinedBoxFile.read(&lastChar,1);
         if(lastChar == ' ') break;
-        combinedBoxFile.seek(-2*sizeof(char));
+        combinedBoxFile.seek(combinedBoxFile.pos()-2*sizeof(char));
         lastPage.prepend(lastChar);
     }
     qDebug() << "Previous last page was " << lastPage;
@@ -266,8 +269,11 @@ void MainWindow::combineAndFinish() {
         if(f0.exists()) f0.remove();
         QFile f1(fileName);
         f1.rename(QString("backup/") + fileName);
-        QFile f2(getBoxName(fileName));
-        f2.remove();
+
+        QFile f2(QString("backup/") + getBoxName(fileName));
+        if(f2.exists()) f2.remove();
+        QFile f3(getBoxName(fileName));
+        f3.rename(QString("backup/") + getBoxName(fileName));
     }
 
     exit(0);
