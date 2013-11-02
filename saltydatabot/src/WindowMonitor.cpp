@@ -33,8 +33,10 @@ WindowMonitor::WindowMonitor() :
     _prevRed(),
     _prevBlue(),
     _imgNum(0),
-    _tess(){
+    _tess(),
+    _server(){
         _tess.Init(NULL,"eng");
+        _server.asyncRun();
 //        _tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
 //        _tess.SetVariable("tessedit_char_whitelist","ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 }
@@ -83,6 +85,9 @@ void WindowMonitor::begin() {
         if(!waitingForWinner) {
             names = readNames(cvMat);
             waitingForWinner = !names[0].empty() && !names[1].empty();
+            if(waitingForWinner){
+                _server.publishNames(names[0],names[1]);
+            }
         } else {
             winner = findWinner(cvMat);
             if(winner != -1){
@@ -93,7 +98,7 @@ void WindowMonitor::begin() {
         }
         fclose(f);
 
-        waitKey(8000);
+        waitKey(5000);
 
     }
 }
@@ -161,11 +166,11 @@ NameReturn WindowMonitor::readName(cv::Mat in, bool isRed) {
     if(isRed){
 //        inRange(in,Scalar(25,55,165),Scalar(80,85,245),in);
 //        inRange(in,Scalar(25,50,160),Scalar(80,90,245),in);
-        inRange(in,Scalar(25,50,145),Scalar(80,90,245),in);
+        inRange(in,Scalar(22,48,145),Scalar(83,93,245),in);
 
     } else {
 //        inRange(in,Scalar(185,135,28),Scalar(255,170,100),in);
-        inRange(in,Scalar(185,120,28),Scalar(255,170,100),in);
+        inRange(in,Scalar(180,117,26),Scalar(255,173,103),in);
     }
 
     findContours(in.clone(),contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point(0,0));

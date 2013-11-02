@@ -12,6 +12,7 @@
 #include <string>
 #include <tesseract/baseapi.h>
 #include <boost/array.hpp>
+#include "Server.h"
 
 typedef struct {
 	std::string name;
@@ -42,6 +43,7 @@ private:
 	std::string _prevBlue;
 	int _imgNum;
 	tesseract::TessBaseAPI _tess;
+	Server _server;
 };
 
 #endif /* WINDOWMONITOR_H_ */
